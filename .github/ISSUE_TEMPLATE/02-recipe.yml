@@ -1,0 +1,82 @@
+name: New recipe or correction
+description: Suggest a new coffee recipe or correct an existing one
+title: "[Recipe]: "
+labels:
+  - recipe
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for helping keep the WhatCoffee recipe collection useful and accurate.
+
+  - type: checkboxes
+    id: existing_issue
+    attributes:
+      label: Existing issue
+      options:
+        - label: I searched the existing recipes and issues for this drink or correction.
+          required: true
+
+  - type: dropdown
+    id: change_type
+    attributes:
+      label: Type of change
+      options:
+        - New recipe
+        - Recipe correction
+        - Description correction
+        - Origin correction
+        - Serving information correction
+    validations:
+      required: true
+
+  - type: input
+    id: coffee_name
+    attributes:
+      label: Coffee name
+      placeholder: Cappuccino
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_recipe
+    attributes:
+      label: Proposed recipe or correction
+      description: Include ingredients, quantities, preparation steps, origin, and serving style where relevant.
+      placeholder: Describe exactly what should be added or changed.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Why is this change needed?
+      description: Explain what the addition improves or what is currently inaccurate.
+    validations:
+      required: true
+
+  - type: textarea
+    id: sources
+    attributes:
+      label: Supporting sources
+      description: Add reliable links supporting the recipe, proportions, preparation, or origin.
+      placeholder: |
+        - https://example.com/source
+    validations:
+      required: true
+
+  - type: textarea
+    id: regional_variations
+    attributes:
+      label: Regional or café variations
+      description: Note any common variations that could explain different recipes or proportions.
+
+  - type: checkboxes
+    id: accuracy
+    attributes:
+      label: Accuracy checklist
+      options:
+        - label: The proposed information is supported by the sources above.
+          required: true
+        - label: I have clearly identified estimates or regional variations.
+          required: true
+
