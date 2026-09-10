@@ -1,4 +1,5 @@
 import { z } from "zod";
+export type { TemperaturePreference } from "@/lib/coffee-preferences";
 
 const ingredientSchema = z.object({
   amount: z.string(),
@@ -25,15 +26,8 @@ const coffeeSchema = z.object({
 });
 
 export type Coffee = z.infer<typeof coffeeSchema>;
-export type TemperaturePreference = "any" | "Hot" | "Cold";
-
-export const doesCoffeeMatchTemperature = (coffee: Coffee, temperature: TemperaturePreference) => {
-  if (temperature === "any") return true;
-  if (coffee.served === "Hot & cold") return true;
-  if (temperature === "Cold") return coffee.served === "Cold" || coffee.served === "Iced";
-  return coffee.served === "Hot";
-};
-
+export type CoffeeBrowserItem = Pick<Coffee, "description" | "name" | "origin" | "served" | "slug" | "tone" | "type" | "visual" | "withMilk">;
+export type CoffeeDiscoveryItem = Pick<Coffee, "character" | "name" | "origin" | "served" | "slug" | "strength" | "sweetness" | "type" | "withMilk">;
 const coffeeData: Coffee[] = [
   {
     slug: "espresso",
@@ -957,6 +951,43 @@ const coffeeData: Coffee[] = [
 
 export const coffees = z.array(coffeeSchema).parse(coffeeData);
 
+export const coffeeBrowserItems: CoffeeBrowserItem[] = coffees.map((coffee) => ({
+  description: coffee.description,
+  name: coffee.name,
+  origin: coffee.origin,
+  served: coffee.served,
+  slug: coffee.slug,
+  tone: coffee.tone,
+  type: coffee.type,
+  visual: coffee.visual,
+  withMilk: coffee.withMilk,
+}));
+
+export const coffeeDiscoveryItems: CoffeeDiscoveryItem[] = coffees.map((coffee) => ({
+  character: coffee.character,
+  name: coffee.name,
+  origin: coffee.origin,
+  served: coffee.served,
+  slug: coffee.slug,
+  strength: coffee.strength,
+  sweetness: coffee.sweetness,
+  type: coffee.type,
+  withMilk: coffee.withMilk,
+}));
+
 export function getCoffee(slug: string) {
   return coffees.find((coffee) => coffee.slug === slug);
 }
+
+export const getRelatedCoffees = (coffee: Coffee, limit = 3) => coffees
+  .filter((candidate) => candidate.slug !== coffee.slug)
+  .map((candidate) => ({
+    coffee: candidate,
+    score:
+      Number(candidate.type === coffee.type) * 3
+      + Number(candidate.served === coffee.served) * 2
+      + Number(candidate.withMilk === coffee.withMilk),
+  }))
+  .sort((left, right) => right.score - left.score)
+  .slice(0, limit)
+  .map(({ coffee: relatedCoffee }) => relatedCoffee);

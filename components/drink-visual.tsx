@@ -1,6 +1,11 @@
-import type { Coffee } from "@/lib/coffees";
+import type { CoffeeBrowserItem } from "@/lib/coffees";
 
-export function DrinkVisual({ coffee, large = false }: { coffee: Coffee; large?: boolean }) {
+type DrinkVisualProps = {
+  readonly coffee: Pick<CoffeeBrowserItem, "tone" | "visual" | "withMilk">;
+  readonly large?: boolean;
+};
+
+export const DrinkVisual = ({ coffee, large = false }: DrinkVisualProps) => {
   const isIced = coffee.visual === "iced";
   const isCold = coffee.visual === "cold";
   const isGlass = isIced || isCold;
@@ -37,4 +42,4 @@ export function DrinkVisual({ coffee, large = false }: { coffee: Coffee; large?:
       <span className="drink-shadow" />
     </div>
   );
-}
+};

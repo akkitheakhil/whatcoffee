@@ -46,6 +46,23 @@ GITHUB_REPOSITORY=akkitheakhil/whatcoffee
 
 `GITHUB_REPOSITORY` defaults to `akkitheakhil/whatcoffee`, so only `GITHUB_TOKEN` is required for this project. Without a token, the form shows a clear unavailable state and does not submit anything.
 
+## Search and sharing configuration
+
+WhatCoffee generates canonical URLs, an XML sitemap, social sharing images, recipe structured data, and machine-readable recipe indexes. On Vercel, canonical URLs use `VERCEL_PROJECT_PRODUCTION_URL` automatically. Set `SITE_URL` when you want to force a custom production domain:
+
+```env
+SITE_URL=https://your-domain.example
+```
+
+After deployment:
+
+1. Add the site to [Google Search Console](https://search.google.com/search-console/about) and verify the preferred production domain.
+2. Add the verification value to `GOOGLE_SITE_VERIFICATION` in Vercel, then redeploy.
+3. Submit `https://your-domain.example/sitemap.xml` in Search Console and Bing Webmaster Tools.
+4. Test several drink pages with Google's [Rich Results Test](https://search.google.com/test/rich-results).
+
+AI assistants can discover the concise catalogue at `/llms.txt` and the complete recipe text at `/llms-full.txt`. Both files point back to the canonical recipe pages.
+
 For a production build:
 
 ```bash
@@ -88,7 +105,7 @@ Contributions are welcome. The easiest way to help is to make a focused change a
    pnpm build
    ```
 
-4. Push your branch and create a pull request against `main`.
+4. Push your branch and create a pull request against `master`.
 
 In the pull request description, explain:
 

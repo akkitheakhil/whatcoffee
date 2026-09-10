@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { SuggestionForm } from "@/components/suggestion-form";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Suggest a recipe" };
+export const metadata: Metadata = createPageMetadata({
+  title: "Suggest a Coffee Recipe",
+  description: "Suggest a coffee drink or correction for the open-source WhatCoffee recipe collection.",
+  path: "/suggest",
+  isIndexed: false,
+});
 
 export default function SuggestPage() {
   return (

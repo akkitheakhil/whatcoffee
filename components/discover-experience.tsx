@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { coffees, doesCoffeeMatchTemperature } from "@/lib/coffees";
-import type { Coffee, TemperaturePreference } from "@/lib/coffees";
+import { doesCoffeeMatchTemperature } from "@/lib/coffee-preferences";
+import type { TemperaturePreference } from "@/lib/coffee-preferences";
+import type { CoffeeDiscoveryItem } from "@/lib/coffees";
 import { ArrowIcon, CloseIcon, ShuffleIcon } from "./icons";
 
 type Phase = "idle" | "spinning" | "result";
@@ -17,8 +18,12 @@ type StoredPreferences = Omit<Partial<Preferences>, "temperature"> & {
   temperature?: Preferences["temperature"] | "Iced";
 };
 type IdleNeighbours = {
-  readonly previous: Coffee;
-  readonly next: Coffee;
+  readonly previous: CoffeeDiscoveryItem;
+  readonly next: CoffeeDiscoveryItem;
+};
+
+type DiscoverExperienceProps = {
+  readonly coffees: readonly CoffeeDiscoveryItem[];
 };
 
 const defaultPreferences: Preferences = {
@@ -30,11 +35,11 @@ const defaultPreferences: Preferences = {
 
 const reelDelays = [55, 55, 60, 65, 70, 80, 90, 105, 125, 150, 185, 225];
 
-function randomItem<T>(items: T[]): T {
+function randomItem<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function chooseCoffee(preferences: Preferences, previous?: Coffee | null) {
+function chooseCoffee(coffees: readonly CoffeeDiscoveryItem[], preferences: Preferences, previous?: CoffeeDiscoveryItem | null) {
   let pool = coffees.filter((coffee) => {
     const temperatureMatches = doesCoffeeMatchTemperature(coffee, preferences.temperature);
     const milkMatches = preferences.milk === "any" || (preferences.milk === "with" ? coffee.withMilk : !coffee.withMilk);
@@ -42,7 +47,7 @@ function chooseCoffee(preferences: Preferences, previous?: Coffee | null) {
   });
 
   if (pool.length > 1 && previous) pool = pool.filter((coffee) => coffee.slug !== previous.slug);
-  if (!pool.length) pool = coffees;
+  if (!pool.length) pool = [...coffees];
 
   const weighted = pool.flatMap((coffee) => {
     const distance = Math.abs(coffee.strength - preferences.strength) + Math.abs(coffee.sweetness - preferences.sweetness);
@@ -53,7 +58,7 @@ function chooseCoffee(preferences: Preferences, previous?: Coffee | null) {
   return randomItem(weighted);
 }
 
-function getNeighbors(coffee: Coffee) {
+function getNeighbors(coffees: readonly CoffeeDiscoveryItem[], coffee: CoffeeDiscoveryItem) {
   const index = coffees.findIndex((item) => item.slug === coffee.slug);
   return {
     previous: coffees[(index - 1 + coffees.length) % coffees.length],
@@ -61,7 +66,7 @@ function getNeighbors(coffee: Coffee) {
   };
 }
 
-const createIdleNeighbours = (): IdleNeighbours => {
+const createIdleNeighbours = (coffees: readonly CoffeeDiscoveryItem[]): IdleNeighbours => {
   const previous = randomItem(coffees);
   const remainingCoffees = coffees.filter((coffee) => coffee.slug !== previous.slug);
 
@@ -71,20 +76,20 @@ const createIdleNeighbours = (): IdleNeighbours => {
   };
 };
 
-export function DiscoverExperience() {
+export function DiscoverExperience({ coffees }: DiscoverExperienceProps) {
   const [phase, setPhase] = useState<Phase>("idle");
-  const [displayed, setDisplayed] = useState<Coffee>(coffees[4]);
+  const [displayed, setDisplayed] = useState<CoffeeDiscoveryItem>(coffees[4]);
   const [idleNeighbours, setIdleNeighbours] = useState<IdleNeighbours | null>(null);
-  const [selected, setSelected] = useState<Coffee | null>(null);
+  const [selected, setSelected] = useState<CoffeeDiscoveryItem | null>(null);
   const [preferences, setPreferences] = useState<Preferences>(defaultPreferences);
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [reelKey, setReelKey] = useState(0);
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIdleNeighbours(createIdleNeighbours()), 0);
+    const timer = window.setTimeout(() => setIdleNeighbours(createIdleNeighbours(coffees)), 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [coffees]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("whatcoffee-preferences");
@@ -118,7 +123,7 @@ export function DiscoverExperience() {
       (nextPreferences.milk === "any" || (nextPreferences.milk === "with" ? coffee.withMilk : !coffee.withMilk)),
     );
     const pool = matchingPool.length ? matchingPool : coffees;
-    const finalCoffee = chooseCoffee(nextPreferences, selected);
+    const finalCoffee = chooseCoffee(coffees, nextPreferences, selected);
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     setDisplayed(randomItem(pool));
     setReelKey((key) => key + 1);
@@ -154,7 +159,7 @@ export function DiscoverExperience() {
       setPhase("result");
     }, elapsed + 240);
     timers.current.push(settleTimer);
-  }, [preferences, selected]);
+  }, [coffees, preferences, selected]);
 
   const savePreferences = (next: Preferences, spinNow: boolean) => {
     setPreferences(next);
@@ -163,7 +168,7 @@ export function DiscoverExperience() {
     if (spinNow) spin(next);
   };
 
-  const neighbors = useMemo(() => getNeighbors(displayed), [displayed]);
+  const neighbors = useMemo(() => getNeighbors(coffees, displayed), [coffees, displayed]);
   const isIdle = phase === "idle";
   const isSpinning = phase === "spinning";
   const isResult = phase === "result";

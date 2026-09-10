@@ -2,14 +2,19 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { coffees, doesCoffeeMatchTemperature } from "@/lib/coffees";
+import type { CoffeeBrowserItem } from "@/lib/coffees";
+import { doesCoffeeMatchTemperature } from "@/lib/coffee-preferences";
 import { ArrowIcon, SearchIcon } from "./icons";
 import { DrinkVisual } from "./drink-visual";
 
 const filters = ["All", "Hot", "Cold", "With milk", "No milk"] as const;
 type Filter = (typeof filters)[number];
 
-export function CoffeeBrowser() {
+type CoffeeBrowserProps = {
+  readonly coffees: readonly CoffeeBrowserItem[];
+};
+
+export const CoffeeBrowser = ({ coffees }: CoffeeBrowserProps) => {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("All");
 
@@ -22,7 +27,7 @@ export function CoffeeBrowser() {
         || (filter === "With milk" ? coffee.withMilk : filter === "No milk" ? !coffee.withMilk : false);
       return matchesSearch && matchesFilter;
     });
-  }, [filter, query]);
+  }, [coffees, filter, query]);
   const hasSearch = query.trim().length > 0;
   const emptyTitle = hasSearch ? "No coffee matches that search." : "No coffee in this filter.";
   const emptyDescription = hasSearch
@@ -67,4 +72,4 @@ export function CoffeeBrowser() {
       )}
     </>
   );
-}
+};
