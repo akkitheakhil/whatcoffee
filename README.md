@@ -1,67 +1,49 @@
-# WhatCoffee
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="WhatCoffee, a local-first coffee picker and recipe shelf">
+</p>
 
-WhatCoffee is a small, local-first coffee discovery PWA. Spin for a drink, tune a few preferences, browse the coffee shelf, and open a concise recipe when something catches your eye.
+<p align="center">
+  <strong>Stop deciding. Start brewing.</strong><br>
+  Spin for a coffee, refine the result with a few preferences, then follow a concise recipe without wading through a recipe blog.
+</p>
 
-## Features
+<p align="center">
+  <a href="#run-locally">Run locally</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#contributing">Contribute</a>
+</p>
 
-- Surprise-me coffee reel with paced transitions and reduced-motion support
-- 54 coffee and tea-latte recipes with ingredients, steps, origin, and serving details
-- Preference matching for temperature, milk, perceived strength, and perceived sweetness
-- Search and filters for hot, cold, with-milk, and no-milk drinks
-- Responsive layouts designed for desktop and mobile browsers
-- System, light, and dark themes with a saved theme preference
-- Installable PWA manifest and a service worker for shell and page caching
-- Local-first prototype: no account or analytics; recipe suggestions are sent to GitHub for review when configured
+## How it works
 
-## Tech stack
+1. **Spin** — let the coffee reel choose from 50+ drinks.
+2. **Refine** — optionally tune temperature, milk, perceived strength, and sweetness.
+3. **Make** — open a focused recipe with measured ingredients, preparation steps, origin, and serving notes.
 
-- Next.js App Router
-- React and TypeScript
-- Tailwind CSS v4 with shared CSS design tokens
-- `next-themes` for theme switching
-- Zod for coffee data validation
-- `pnpm` for package management
+The picker starts with an unanswered `?`, so the first visit never looks like it has already chosen for you. Results remain local to the browser, preferences are saved on the device, and reduced-motion settings are respected.
 
-## Getting started
+## What is inside
 
-Requirements: Node.js 20 or newer and pnpm 11 or newer.
+- A paced surprise-me reel with preference-aware recommendations
+- 50+ coffee and tea-latte recipes, searchable by name and filterable by serving style
+- Dedicated recipe pages with ingredients, proportions, method, origin, and flavour profile
+- Responsive desktop and mobile layouts with light, dark, and system themes
+- An installable PWA manifest and service worker for shell and page caching
+- Recipe suggestions submitted to GitHub for review when the server-side integration is configured
+- Canonical URLs, recipe structured data, an XML sitemap, and AI-readable recipe indexes
+- No account requirement or analytics
+
+## Run locally
+
+You need Node.js 20 or newer and pnpm 11 or newer.
 
 ```bash
+git clone https://github.com/akkitheakhil/whatcoffee.git
+cd whatcoffee
 pnpm install
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
-
-## GitHub recipe suggestions
-
-The suggestion form creates an issue in [`akkitheakhil/whatcoffee`](https://github.com/akkitheakhil/whatcoffee) through a server-side route. The GitHub token is never exposed to the browser.
-
-Create a fine-grained GitHub personal access token with **Issues: Read and write** permission for the repository, then add these variables to `.env.local` for local testing or to the Vercel project settings for production:
-
-```env
-GITHUB_TOKEN=github_pat_...
-GITHUB_REPOSITORY=akkitheakhil/whatcoffee
-```
-
-`GITHUB_REPOSITORY` defaults to `akkitheakhil/whatcoffee`, so only `GITHUB_TOKEN` is required for this project. Without a token, the form shows a clear unavailable state and does not submit anything.
-
-## Search and sharing configuration
-
-WhatCoffee generates canonical URLs, an XML sitemap, social sharing images, recipe structured data, and machine-readable recipe indexes. On Vercel, canonical URLs use `VERCEL_PROJECT_PRODUCTION_URL` automatically. Set `SITE_URL` when you want to force a custom production domain:
-
-```env
-SITE_URL=https://your-domain.example
-```
-
-After deployment:
-
-1. Add the site to [Google Search Console](https://search.google.com/search-console/about) and verify the preferred production domain.
-2. Add the verification value to `GOOGLE_SITE_VERIFICATION` in Vercel, then redeploy.
-3. Submit `https://your-domain.example/sitemap.xml` in Search Console and Bing Webmaster Tools.
-4. Test several drink pages with Google's [Rich Results Test](https://search.google.com/test/rich-results).
-
-AI assistants can discover the concise catalogue at `/llms.txt` and the complete recipe text at `/llms-full.txt`. Both files point back to the canonical recipe pages.
 
 For a production build:
 
@@ -70,57 +52,91 @@ pnpm build
 pnpm start
 ```
 
-## Scripts
+## Built with
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the Next.js development server |
-| `pnpm build` | Create an optimised production build |
-| `pnpm start` | Serve the production build locally |
-| `pnpm typecheck` | Run TypeScript without emitting files |
-| `pnpm lint` | Run ESLint across the project |
+- [Next.js](https://nextjs.org/) App Router
+- React and TypeScript
+- Tailwind CSS v4 with shared CSS design tokens
+- `next-themes` for theme switching
+- Zod for coffee catalogue validation
+- pnpm for package management
 
-## Project structure
+## Configuration
+
+The app works without environment variables. Configuration is only required for GitHub recipe submissions, a custom production domain, or Google ownership verification.
+
+Copy `.env.example` to `.env.local`, then add only the values you need:
+
+```env
+SITE_URL=
+GOOGLE_SITE_VERIFICATION=
+GITHUB_TOKEN=
+GITHUB_REPOSITORY=akkitheakhil/whatcoffee
+```
+
+<details>
+<summary><strong>GitHub recipe suggestions</strong></summary>
+
+The suggestion form creates an issue in [`akkitheakhil/whatcoffee`](https://github.com/akkitheakhil/whatcoffee) through a server-side route. The GitHub token is never sent to the browser.
+
+Create a fine-grained GitHub personal access token with **Issues: Read and write** permission for this repository, then set `GITHUB_TOKEN`. `GITHUB_REPOSITORY` already defaults to `akkitheakhil/whatcoffee`. Without a token, the form displays an unavailable state and sends nothing.
+
+</details>
+
+<details>
+<summary><strong>Search and sharing</strong></summary>
+
+WhatCoffee generates canonical URLs, an XML sitemap, social-sharing images, recipe structured data, `/llms.txt`, and `/llms-full.txt`.
+
+Vercel deployments use `VERCEL_PROJECT_PRODUCTION_URL` automatically. Set `SITE_URL` when a custom domain should be canonical:
+
+```env
+SITE_URL=https://your-domain.example
+```
+
+After deployment:
+
+1. Add the production site to [Google Search Console](https://search.google.com/search-console/about).
+2. If you use HTML-tag verification, set `GOOGLE_SITE_VERIFICATION` to the value from the tag and redeploy.
+3. Submit `https://your-domain.example/sitemap.xml` through Search Console and Bing Webmaster Tools.
+4. Check several drink pages with Google's [Rich Results Test](https://search.google.com/test/rich-results).
+
+</details>
+
+## Project map
 
 ```text
-app/                 App Router pages, metadata, manifest, and shared CSS
-components/          Interactive experience and reusable UI components
-lib/coffees.ts       Validated coffee catalogue and recipe data
-public/sw.js         Service worker used by the production PWA
+app/                       Pages, routes, metadata, manifest, sitemap, and shared CSS
+components/                Interactive experiences and reusable UI
+lib/coffees.ts             Validated coffee catalogue and recipe data
+lib/seo.ts                 Metadata and structured-data helpers
+public/sw.js               PWA service worker
+.github/                   CI, issue forms, and pull-request template
 ```
 
 Coffee content lives in [`lib/coffees.ts`](lib/coffees.ts). Shared light and dark design tokens live at the top of [`app/globals.css`](app/globals.css).
 
-## How to contribute
+## Quality checks
 
-Contributions are welcome. The easiest way to help is to make a focused change and open a pull request:
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+```
 
-1. Fork the [WhatCoffee repository](https://github.com/akkitheakhil/whatcoffee) and create a branch for your change.
-2. Make the change, keeping recipe content accurate and the existing keyboard, responsive, and reduced-motion behaviour intact.
-3. Run the checks locally:
+GitHub Actions runs the same checks on pushes and pull requests targeting `master`.
 
-   ```bash
-   pnpm typecheck
-   pnpm lint
-   pnpm build
-   ```
+## Contributing
 
-4. Push your branch and create a pull request against `master`.
+Coffee knowledge, recipe corrections, code, design, accessibility improvements, and documentation are all welcome.
 
-In the pull request description, explain:
+1. Check the existing issues or open a structured [bug report](https://github.com/akkitheakhil/whatcoffee/issues/new?template=01-bug.yml), [recipe proposal](https://github.com/akkitheakhil/whatcoffee/issues/new?template=02-recipe.yml), or [feature request](https://github.com/akkitheakhil/whatcoffee/issues/new?template=03-feature.yml).
+2. Fork the repository and create a focused branch.
+3. Make the change and run the quality checks above.
+4. Open a pull request against `master` and explain what changed, why it is needed, and how it was tested.
 
-- **Why is this change needed?** Describe the problem, incorrect information, or user experience it improves. Include a source or reference for factual recipe corrections when possible.
-- **What type of change is it?** Choose the category that best fits:
-  - Bug fix
-  - New recipe
-  - Recipe or content correction
-  - Feature or enhancement
-  - Design or accessibility improvement
-  - Documentation or maintenance
-- **What changed and how was it tested?** Summarise the implementation and list the checks you ran. Include screenshots for visual changes when helpful.
-
-For a new recipe or recipe correction, please verify the drink name, origin, serving temperature, ingredients, proportions, preparation steps, and description before submitting the pull request.
+For recipes and factual corrections, include reliable sources and verify the drink name, origin, serving temperature, ingredients, proportions, and preparation steps. Preserve the existing keyboard, responsive, theme, and reduced-motion behaviour when changing the interface.
 
 ## License
 
-WhatCoffee is distributed under the MIT License. See [`LICENSE`](LICENSE) in the repository.
+WhatCoffee is available under the [MIT License](LICENSE).
